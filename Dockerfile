@@ -15,7 +15,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
     
 # non-root user
-RUN adduser --disabled-password --gecos "VICE_User" --uid 1000 vice_user
+RUN adduser --disabled-password --gecos "VICE_User" --uid 1000 user
 
 # install all X apps here
 RUN apt-get update && \
@@ -23,17 +23,18 @@ RUN apt-get update && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
-USER vice_user
+RUN mkdir -p /run/user/1000/xpra
+RUN mkdir -p /run/xpra
+RUN chown user:user /run/user/1000/xpra
+RUN chown user:user /run/xpra
+
+USER user
 
 ENV DISPLAY=:100
 
-VOLUME /data
+WORKDIR /home/user
 
-WORKDIR /home/vice_user
+EXPOSE 9876
 
-EXPOSE 10000
+CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
 
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on \
-      --start-child=xterm --exit-with-children --daemon=no \
-      --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" \
-      --pulseaudio=no --notifications=no --bell=no
