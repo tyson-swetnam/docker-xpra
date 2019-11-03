@@ -1,15 +1,16 @@
 # Dockerfile modified to bionic from https://github.com/lanrat/docker-xpra-html5
 
-FROM ubuntu:bionic
+FROM nvidia/opengl:1.0-glvnd-runtime-ubuntu18.04
 MAINTAINER Tyson Lee Swetnam <tswetnam@cyverse.org>
 
 # install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y wget && \
+    apt-get install -y wget gnupg2 && \
     wget -O - http://winswitch.org/gpg.asc | apt-key add - && \
     echo "deb http://winswitch.org/ bionic main" > /etc/apt/sources.list.d/xpra.list && \
-    apt-get update &&
-    DEBIAN_FRONTEND=noninteractive apt-get install -y xpra xvfb xterm && \
+    apt-get update && \
+    apt-get install -y xpra xvfb xterm && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
     
@@ -22,7 +23,7 @@ RUN apt-get update && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
-USER user
+USER vice_user
 
 ENV DISPLAY=:100
 
