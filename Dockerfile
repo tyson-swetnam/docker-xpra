@@ -23,6 +23,11 @@ RUN apt-get update && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
+# Install Gnome 
+RUN apt-get update && apt-get install -y software-properties-common \
+    && add-apt-repository ppa:gnome3-team/gnome3 \
+    && apt-get update && apt-get install -y gnome-shell ubuntu-gnome-desktop
+
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
 RUN chown user:user /run/user/1000/xpra
@@ -36,5 +41,5 @@ WORKDIR /home/user
 
 EXPOSE 9876
 
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
 
