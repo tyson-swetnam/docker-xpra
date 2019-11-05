@@ -28,10 +28,16 @@ RUN apt-get update && apt-get install -y software-properties-common \
     && add-apt-repository ppa:gnome3-team/gnome3 \
     && apt-get update && apt-get install -y gnome-shell ubuntu-gnome-desktop
 
+# Install iCommands
+RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - \
+    && echo "deb https://packages.irods.org/apt/ xenial main" | tee /etc/apt/sources.list.d/renci-irods.list \
+    && apt-get update && apt-get install -y irods-icommands
+
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
 RUN chown user:user /run/user/1000/xpra
 RUN chown user:user /run/xpra
+RUN echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 
 USER user
 
