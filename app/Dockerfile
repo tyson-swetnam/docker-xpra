@@ -28,6 +28,11 @@ RUN mkdir -p /run/xpra
 RUN chown user:user /run/user/1000/xpra
 RUN chown user:user /run/xpra
 
+# Install iCommands
+RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - \
+    && echo "deb https://packages.irods.org/apt/ xenial main" | tee /etc/apt/sources.list.d/renci-irods.list \
+    && apt-get update && apt-get install -y irods-icommands
+
 USER user
 
 ENV DISPLAY=:100
