@@ -23,3 +23,9 @@ RUN $CONDA_DIR/bin/conda config --add channels conda-forge
 RUN bash -c "source $CONDA_DIR/bin/activate orange3 && $CONDA_DIR/bin/conda install orange3"
 RUN echo 'export PATH=~/.conda/bin:$PATH' >> /home/orange/.bashrc
 RUN bash -c "source $CONDA_DIR/bin/activate orange3 && pip install Orange3-Text Orange3-ImageAnalytics Orange3-Network Orange-Bioinformatics"
+
+WORKDIR /home/orange
+
+RUN bash -c "source $CONDA_DIR/bin/activate orange3"
+
+ENTRYPOINT "python -m Orange.canvas"
