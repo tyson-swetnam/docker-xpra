@@ -5,12 +5,15 @@ MAINTAINER Tyson Lee Swetnam <tswetnam@cyverse.org>
 
 # install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
 ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-key list
+
 RUN apt-get update && \
     apt-get install -y wget gnupg2 && \
     wget -O - http://winswitch.org/gpg.asc | apt-key add - && \
     echo "deb http://winswitch.org/ bionic main" > /etc/apt/sources.list.d/xpra.list && \
     apt-get update && \
-    apt-get install -y xpra xvfb xterm && \
+    apt-get install -y xpra xvfb xterm sshfs && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
     

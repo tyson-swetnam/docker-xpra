@@ -1,9 +1,13 @@
 # Dockerfile modified to bionic from https://github.com/lanrat/docker-xpra-html5
-FROM nvidia/cudagl:10.1-runtime-ubuntu18.04
+FROM nvcr.io/nvidia/cudagl:10.1-runtime-ubuntu18.04
 MAINTAINER Tyson Lee Swetnam <tswetnam@cyverse.org>
 
 # install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
 ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y apt-utils software-properties-common curl \
+    && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | apt-key add -
 RUN apt-get update && \
     apt-get install -y wget gnupg2 && \
     wget -O - http://winswitch.org/gpg.asc | apt-key add - && \
