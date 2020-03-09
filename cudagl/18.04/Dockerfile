@@ -32,9 +32,9 @@ RUN apt-get update && apt-get install -y software-properties-common \
     && apt-get update && apt-get install -y gnome-shell ubuntu-gnome-desktop
 
 # Install iCommands
-RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - \
-    && echo "deb https://packages.irods.org/apt/ xenial main" | tee /etc/apt/sources.list.d/renci-irods.list \
-    && apt-get update && apt-get install -y irods-icommands
+RUN wget https://files.renci.org/pub/irods/releases/4.1.12/ubuntu14/irods-icommands-4.1.12-ubuntu14-x86_64.deb && \
+    dpkg -i irods-icommands-4.1.12-ubuntu14-x86_64.deb && \
+    rm irods-icommands-4.1.12-ubuntu14-x86_64.deb
 
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
