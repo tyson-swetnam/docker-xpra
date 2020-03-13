@@ -36,11 +36,19 @@ RUN wget https://files.renci.org/pub/irods/releases/4.1.12/ubuntu14/irods-icomma
     dpkg -i irods-icommands-4.1.12-ubuntu14-x86_64.deb && \
     rm irods-icommands-4.1.12-ubuntu14-x86_64.deb
 
+# Install VirtualGL for testing
+RUN cd /tmp && wget https://sourceforge.net/projects/virtualgl/files/2.6.3/virtualgl_2.6.3_amd64.deb/download -O virtualgl_2.6.3_amd64.deb && \
+    dpkg -i --force-depends virtualgl_2.6.3_amd64.deb && \
+    apt-get -f install && \
+    rm -rf /tmp/*.deb
+
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
 RUN chown user:user /run/user/1000/xpra
 RUN chown user:user /run/xpra
-RUN echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+RUN apt-get install -y language-pack-en-base && \ 
+    locale-gen en_US.UTF-8 && \ 
+    update-locale LANG=en_US.UTF-8
 
 USER user
 
@@ -48,6 +56,7 @@ ENV DISPLAY=:100
 
 WORKDIR /home/user
 
-EXPOSE 9876
+VOLUME /tmp/.X11-unix
 
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+CMD xpra start :10 --video-encoders=nvenc --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no 
+
