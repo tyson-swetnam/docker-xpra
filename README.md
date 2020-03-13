@@ -14,6 +14,8 @@ Image is built from NVIDIA Docker image and is compatible with GPUs - need to in
 docker run -it -p 9876:9876 tswetnam/xpra:bionic 
 ```
 
+With a new `ENTRYPOINT`:
+
 ```
 docker run -it -p 9876:9876 tswetnam/xpra:bionic xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no
 ```
@@ -21,5 +23,5 @@ docker run -it -p 9876:9876 tswetnam/xpra:bionic xpra start --bind-tcp=0.0.0.0:9
 #### Run with NVIDIA GPU
 
 ```
-docker run -it --gpus all -p 9876:9876 tswetnam/xpra:bionic xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no --video-encoders=nvenc
+docker run --gpus all --rm -it -p 9876:9876 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e NVIDIA_DRIVER_CAPABILITIES=all tswetnam/xpra:bionic
 ```
