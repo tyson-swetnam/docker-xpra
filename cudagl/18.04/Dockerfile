@@ -43,14 +43,8 @@ RUN cd /tmp && wget https://sourceforge.net/projects/virtualgl/files/2.6.3/virtu
     rm -rf /tmp/*.deb
 
 # Install NVIDIA drivers --experimental
-<<<<<<< HEAD
 #RUN add-apt-repository ppa:graphics-drivers/ppa && apt update \
 #    && apt install -y nvidia-driver-450
-=======
-
-RUN add-apt-repository ppa:graphics-drivers/ppa && apt update \
-    && apt install -y nvidia-driver-450
->>>>>>> f85e9cf6a796d143646851d2daf669b715d967dc
 
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
@@ -75,10 +69,7 @@ USER user
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 ENV DISPLAY=:10
-<<<<<<< HEAD
 ENV PATH=$PATH:/opt/VirtualGL/bin/
-=======
->>>>>>> f85e9cf6a796d143646851d2daf669b715d967dc
 
 WORKDIR /home/user
 
