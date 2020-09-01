@@ -33,9 +33,7 @@ EndSection
 
 Remove the Option in the `Screen` section:
 
-```
-Option "UseDisplayDevice" "none"
-```
+```Option "UseDisplayDevice" "none"```
 
 Add into the `Screen` section for the first GPU: 
 
