@@ -20,6 +20,9 @@ docker run -it -p 9876:9876 tswetnam/xpra:bionic xpra start --bind-tcp=0.0.0.0:9
 
 #### Run with NVIDIA GPU
 
+You need to have an [xorg]() server running prior to launching. 
+
 ```
-docker run --gpus all --rm -it -p 9876:9876 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e QT_X11_NO_MITSHM=1 -e NVIDIA_DRIVER_CAPABILITIES=all tswetnam/xpra-cudagl:18.04
+export DISPLAY=:0
+docker run --gpus all --rm -it -p 9876:9876 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e QT_X11_NO_MITSHM=1 -e NVIDIA_DRIVER_CAPABILITIES=all tswetnam/xpra:cudagl-18.04
 ```
