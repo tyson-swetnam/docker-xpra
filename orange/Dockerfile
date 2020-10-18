@@ -20,7 +20,7 @@ ENV PASSWORD orange
 ENV HOME /home/${USER}
 RUN useradd -m -s /bin/bash ${USER}
 RUN echo "${USER}:${PASSWORD}" | chpasswd
-#RUN gpasswd -a ${USER} sudo
+RUN gpasswd -a ${USER} sudo
 
 #ADD ./icons/orange.png /usr/share/backgrounds/images/orange.png
 #ADD ./icons/orange.png .conda/share/orange3/orange.png
