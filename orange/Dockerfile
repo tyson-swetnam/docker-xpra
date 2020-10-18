@@ -1,4 +1,4 @@
-FROM tswetnam/xpra-cudagl:bionic
+FROM tswetnam/xpra:bionic
 
 USER root
 
@@ -39,7 +39,3 @@ ENV source $VIRTUAL_ENV/bin/activate
 
 # Start Orange
 CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child="python -m Orange.canvas"  --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
-<<<<<<< HEAD
-
-=======
->>>>>>> 9ed1c3b3096407de5a52a15768b61c915e7fd0a5
