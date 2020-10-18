@@ -6,13 +6,11 @@ USER root
 RUN apt-get update \
     && apt-get install -y bzip2 g++ virtualenv build-essential \
     git python3-pip python3-dev python3-virtualenv \
-    python3-pip python3-numpy software-properties-common
-
-# Install Qt dependencies for the GUI
-RUN pip3 install PyQt5 PyQtWebEngine
+    python3-pip python3-numpy software-properties-common sudo 
 
 # Install Orange3
-RUN pip3 install orange3 Orange3-Text Orange3-ImageAnalytics Orange3-Network Orange-Bioinformatics
+RUN pip3 install --upgrade pip
+RUN pip3 install orange3 Orange3-Text Orange3-ImageAnalytics Orange3-Network Orange-Bioinformatics PyQt5==5.14.0 PyQtWebEngine==5.14.0 python-uinput
 
 # Create Orange user
 ENV USER orange
@@ -38,4 +36,4 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ENV source $VIRTUAL_ENV/bin/activate
 
 # Start Orange
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child="python -m Orange.canvas"  --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child="python3 -m Orange.canvas"  --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
