@@ -36,4 +36,4 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ENV source $VIRTUAL_ENV/bin/activate
 
 # Start Orange
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child="python3 -m Orange.canvas"  --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child="python3 -m Orange.canvas"  --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --file-transfer=on --pulseaudio=no --notifications=no --bell=no :100
