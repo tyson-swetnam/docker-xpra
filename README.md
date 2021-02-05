@@ -1,7 +1,11 @@
+[![Project Supported by CyVerse](https://img.shields.io/badge/Supported%20by-CyVerse-blue.svg)](https://learning.cyverse.org/projects/vice/en/latest/) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![license](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 
-image            | description                               | size   | metrics | build status 
----------------- | ----------------------------------------- | ------ | ------- | --------------
-[![DockerHub](https://img.shields.io/badge/DockerHub-brightgreen.svg?style=popout&logo=Docker)](https://hub.docker.com/r/tswetnam/xpra)  | Xpra NVIDIA OpenGL Ubuntu 18.04 base | [![](https://images.microbadger.com/badges/image/tswetnam/xpra.svg)](https://microbadger.com/images/tswetnam/xpra) | [![](https://img.shields.io/docker/pulls/tswetnam/xpra.svg)](https://hub.docker.com/r/tswetnam/xpra)  |  [![](https://img.shields.io/docker/automated/tswetnam/xpra.svg)](https://hub.docker.com/r/tswetnam/xpra/builds)
+| image | description | name:tag | base image |
+|-------|-------------|----------|------------|
+[![DockerHub](https://img.shields.io/badge/DockerHub-brightgreen.svg?style=popout&logo=Docker)](https://hub.docker.com/r/tswetnam/xpra)  | Xpra NVIDIA OpenGL Ubuntu 18.04 base | tswetnam/xpra | 18.04  | [nvidia/opengl:1.2-glvnd-runtime-ubuntu18.04](https://ngc.nvidia.com/catalog/containers/nvidia:cudagl/tags)
+[![DockerHub](https://img.shields.io/badge/DockerHub-brightgreen.svg?style=popout&logo=Docker)](https://hub.docker.com/r/tswetnam/xpra)  | Xpra NVIDIA OpenGL Ubuntu 20.04 base | tswetnam/xpra | 20.04  | [nvidia/opengl:1.2-glvnd-runtime-ubuntu20.04](https://ngc.nvidia.com/catalog/containers/nvidia:cudagl/tags)
+[![DockerHub](https://img.shields.io/badge/DockerHub-brightgreen.svg?style=popout&logo=Docker)](https://hub.docker.com/r/tswetnam/xpra)  | Xpra NVIDIA CUDA + OpenGL Ubuntu 18.04 base | tswetnam/xpra | cudagl-18.04  | [nvcr.io/nvidia/cudagl:11.2.0-runtime-ubuntu18.04](https://ngc.nvidia.com/catalog/containers/nvidia:cudagl/tags)
+[![DockerHub](https://img.shields.io/badge/DockerHub-brightgreen.svg?style=popout&logo=Docker)](https://hub.docker.com/r/tswetnam/xpra)  | Xpra NVIDIA CUDA + OpenGL Ubuntu 20.04 base | tswetnam/xpra | cudagl-20.04  | [nvcr.io/nvidia/cudagl:11.2.0-runtime-ubuntu20.04](https://ngc.nvidia.com/catalog/containers/nvidia:cudagl/tags)
 
 # docker-xpra
 Ubuntu container with Xpra for running remote desktop applications in browser.
