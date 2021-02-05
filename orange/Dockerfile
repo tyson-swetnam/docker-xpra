@@ -1,4 +1,4 @@
-FROM tswetnam/xpra:bionic
+FROM tswetnam/xpra:20.04
 
 USER root
 
