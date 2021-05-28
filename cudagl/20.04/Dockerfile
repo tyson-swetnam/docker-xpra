@@ -1,16 +1,26 @@
 # Dockerfile modified to bionic from https://github.com/lanrat/docker-xpra-html5
-FROM nvcr.io/nvidia/cudagl:11.2.0-runtime-ubuntu20.04
-MAINTAINER Tyson Lee Swetnam <tswetnam@cyverse.org>
+FROM nvcr.io/nvidia/cudagl:11.2.2-runtime-ubuntu20.04
+
+# Build-time metadata as defined at http://label-schema.org
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+LABEL org.label-schema.build-date=$BUILD_DATE \
+    org.label-schema.name="CyVerse XPRA CUDAGL" \
+    org.label-schema.description="XPRA Remote Desktop, additional depends for CyVerse K8s workbench" \
+    org.label-schema.url="https://cyverse.org" \
+    org.label-schema.vcs-ref=$VCS_REF \
+    org.label-schema.vcs-url="e.g. https://github.com/cyverse-vice/xpra" \
+    org.label-schema.vendor="CyVerse" \
+    org.label-schema.version=$VERSION \
+    org.label-schema.schema-version="1.0.0"
 
 # install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -y wget gnupg2 apt-transport-https && \
-    wget -O - http://winswitch.org/gpg.asc | apt-key add - && \
-    echo "deb http://winswitch.org/ focal main" > /etc/apt/sources.list.d/xpra.list
-
-RUN wget -O - https://xpra.org/gpg.asc | apt-key add - && \
+    wget -O - https://xpra.org/gpg.asc | apt-key add - && \
     echo "deb https://xpra.org/ focal main" > /etc/apt/sources.list.d/xpra.list
 
 RUN apt-get update && \
@@ -22,6 +32,8 @@ RUN apt-key list
     
 # non-root user
 RUN adduser --disabled-password --gecos "VICE_User" --uid 1000 user
+RUN apt-get update && apt-get install -y sudo
+RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 # install all X apps here
 RUN apt-get update && \
@@ -36,7 +48,8 @@ RUN apt-get install -y gnome-shell gnome-session gdm3
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
 RUN chown user:user /run/user/1000/xpra
-RUN chown user:user /run/xpra
+RUN chown -R user:user /run/xpra
+RUN chown -R user:user /run/user
 
 # iRODS iCommands kludge
 RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - && \
@@ -45,15 +58,15 @@ RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - 
     wget -c \
     http://security.ubuntu.com/ubuntu/pool/main/p/python-urllib3/python-urllib3_1.22-1ubuntu0.18.04.2_all.deb \
     http://security.ubuntu.com/ubuntu/pool/main/r/requests/python-requests_2.18.4-2ubuntu0.1_all.deb \
-    http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5.5_amd64.deb && \
+    http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5.6_amd64.deb && \
     apt install -y \
     ./python-urllib3_1.22-1ubuntu0.18.04.2_all.deb \
     ./python-requests_2.18.4-2ubuntu0.1_all.deb \
-    ./libssl1.0.0_1.0.2n-1ubuntu5.5_amd64.deb && \
+    ./libssl1.0.0_1.0.2n-1ubuntu5.6_amd64.deb && \
     rm -rf \
     ./python-urllib3_1.22-1ubuntu0.18.04.2_all.deb \
     ./python-requests_2.18.4-2ubuntu0.1_all.deb \
-    ./libssl1.0.0_1.0.2n-1ubuntu5.5_amd64.deb
+    ./libssl1.0.0_1.0.2n-1ubuntu5.6_amd64.deb
 
 RUN apt install -y irods-icommands
 
@@ -104,23 +117,46 @@ RUN apt-get install -y curl grep sed dpkg && \
     rm tini.deb && \
     apt-get clean
 
+RUN chown -R user:user /opt/conda
+
+RUN apt-get update && apt-get install -y sudo
+RUN usermod -aG sudo user
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# install gnome terminal and some QT stuff for X11 
+RUN apt-get update && apt-get install -y gnome-terminal libqt5x11extras5
+
+# install nautilus file manager
+RUN apt-get update && apt-get install -y nautilus seahorse-nautilus 
+
+# add some viz permissions for VirtualGL
+RUN chown -R user:user /run/user
+RUN apt-get update && apt-get install -y libxcb-xinerama0
+
+# Install CyberDuck CLI
+RUN echo "deb https://s3.amazonaws.com/repo.deb.cyberduck.io stable main" | tee /etc/apt/sources.list.d/cyberduck.list > /dev/null && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE7097963FEFBE72 && \
+    apt-get update && \
+    apt-get install duck
+
+# go ahead and upgrade everything
+RUN apt-get update
+
 USER user
+
+RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc
+
 # Set some environment stuff
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
-ENV DISPLAY=:10
+
 ENV PATH=$PATH:/opt/VirtualGL/bin/
-
-WORKDIR /home/user
-
-VOLUME /tmp/.X11-unix
-
-USER user
 
 ENV DISPLAY=:100
 
 WORKDIR /home/user
-
+VOLUME /tmp/.X11-unix
 EXPOSE 9876
 
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=gnome-terminal --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
