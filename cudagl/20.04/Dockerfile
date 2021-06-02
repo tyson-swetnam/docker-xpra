@@ -109,7 +109,6 @@ RUN cd /tmp && wget https://sourceforge.net/projects/virtualgl/files/2.6.3/virtu
 RUN chown -R user:user /run/user
 RUN apt-get update && apt-get install -y libxcb-xinerama0
 
-
 RUN apt-get install -y language-pack-en-base && \ 
     locale-gen en_US.UTF-8 && \ 
     update-locale LANG=en_US.UTF-8
@@ -122,7 +121,6 @@ ENV LC_ALL "en_US.UTF-8"
 
 # Install MiniConda and Tini
 
-ENV TZ=US/Phoenix
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
 
