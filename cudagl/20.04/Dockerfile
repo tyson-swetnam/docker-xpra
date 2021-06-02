@@ -19,37 +19,66 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y wget gnupg2 apt-transport-https && \
+    apt-get install -y wget \
+    gnupg2 \ 
+    apt-transport-https && \
     wget -O - https://xpra.org/gpg.asc | apt-key add - && \
     echo "deb https://xpra.org/ focal main" > /etc/apt/sources.list.d/xpra.list
 
 RUN apt-get update && \
-    apt-get install -y xpra xvfb xterm sshfs && \
+    apt-get install -y xpra \
+    xvfb \
+    xterm \
+    sshfs && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
 RUN apt-key list
     
-# non-root user
+# Add sudo to user
 RUN adduser --disabled-password --gecos "VICE_User" --uid 1000 user
 RUN apt-get update && apt-get install -y sudo
+RUN usermod -aG sudo user
 RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 
 # install all X apps here
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y firefox && \
+    DEBIAN_FRONTEND=noninteractive && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
-# Install Gnome 
-RUN apt-get update && apt-get install -y software-properties-common tasksel
-RUN apt-get install -y gnome-shell gnome-session gdm3
+RUN apt-get update && apt-get install -y apt-utils \
+    build-essential \
+    firefox \
+    gdm3 \
+    glances \
+    glmark2 \
+    gnome-shell \
+    gnome-session \
+    gnome-terminal \
+    htop \
+    libqt5x11extras5 \
+    linux-generic-hwe-18.04-edge \
+    nautilus \
+    seahorse-nautilus \
+    software-properties-common \
+    tasksel
 
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra
 RUN chown user:user /run/user/1000/xpra
 RUN chown -R user:user /run/xpra
 RUN chown -R user:user /run/user
+
+# Install CyberDuck CLI
+RUN echo "deb https://s3.amazonaws.com/repo.deb.cyberduck.io stable main" | tee /etc/apt/sources.list.d/cyberduck.list > /dev/null && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE7097963FEFBE72 && \
+    apt-get update && \
+    apt-get install duck
+
+# Install Go
+RUN wget -c https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
 
 # iRODS iCommands kludge
 RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - && \
@@ -76,6 +105,11 @@ RUN cd /tmp && wget https://sourceforge.net/projects/virtualgl/files/2.6.3/virtu
     apt-get -f install && \
     rm -rf /tmp/*.deb
 
+# add some viz permissions for VirtualGL
+RUN chown -R user:user /run/user
+RUN apt-get update && apt-get install -y libxcb-xinerama0
+
+
 RUN apt-get install -y language-pack-en-base && \ 
     locale-gen en_US.UTF-8 && \ 
     update-locale LANG=en_US.UTF-8
@@ -85,10 +119,6 @@ RUN echo en_US.UTF-8 UTF-8 >> /etc/locale.gen && locale-gen
 
 ENV TZ America/Phoenix
 ENV LC_ALL "en_US.UTF-8"
-
-# Add monitoring tools
-RUN apt-get install -y --install-recommends linux-generic-hwe-18.04-edge
-RUN apt-get install -y htop glances glmark2
 
 # Install MiniConda and Tini
 
@@ -119,39 +149,19 @@ RUN apt-get install -y curl grep sed dpkg && \
 
 RUN chown -R user:user /opt/conda
 
-RUN apt-get update && apt-get install -y sudo
-RUN usermod -aG sudo user
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-# install gnome terminal and some QT stuff for X11 
-RUN apt-get update && apt-get install -y gnome-terminal libqt5x11extras5
-
-# install nautilus file manager
-RUN apt-get update && apt-get install -y nautilus seahorse-nautilus 
-
-# add some viz permissions for VirtualGL
-RUN chown -R user:user /run/user
-RUN apt-get update && apt-get install -y libxcb-xinerama0
-
-# Install CyberDuck CLI
-RUN echo "deb https://s3.amazonaws.com/repo.deb.cyberduck.io stable main" | tee /etc/apt/sources.list.d/cyberduck.list > /dev/null && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE7097963FEFBE72 && \
-    apt-get update && \
-    apt-get install duck
-
-# go ahead and upgrade everything
-RUN apt-get update
-
 USER user
 
 RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
+# add iRODS iCommands to user profile as JSON
+RUN mkdir /home/user/.irods && echo '{"irods_host": "data.cyverse.org", "irods_port": 1247, "irods_user_name": "$IPLANT_USER", "irods_zone_name": "iplant"}' | tee  > /home/user/.irods/irods_environment.json
+
 # Set some environment stuff
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 
-ENV PATH=$PATH:/opt/VirtualGL/bin/
+ENV PATH=$PATH:/opt/VirtualGL/bin/:/usr/local/go/bin 
 
 ENV DISPLAY=:100
 
