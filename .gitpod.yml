@@ -1,1 +1,2 @@
-image: harbor.cyverse.org/gitpod/buildx:latest
+image:
+  file: .gitpod.Dockerfile
